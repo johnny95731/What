@@ -1,0 +1,24 @@
+{
+    "include": ["**/*.ts", "**/*.d.ts", "**/*.tsx", "**/*.vue"],
+    "exclude": ["src/**/__tests__/*", "node_modules"],
+    "compilerOptions": {
+      "baseUrl": "./",
+      "target": "ES2022",
+      "useDefineForClassFields": true,
+      "module": "ES2022",
+      "moduleResolution": "Node",
+      "strict": true,
+      "jsx": "preserve",
+      "resolveJsonModule": true,
+      "isolatedModules": true,
+      "esModuleInterop": true,
+      "allowImportingTsExtensions": true,
+      "allowJs": true,
+      "skipLibCheck": true,
+      "noEmit": true,
+      "lib": ["DOM", "DOM.Iterable", "ES2022"],
+      "paths": {
+        "@/*": ["./src/*"],
+      }
+    }
+  }

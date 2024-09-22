@@ -1,0 +1,35 @@
+{
+  "name": "what",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "tailwindcss": "^3.4.12",
+    "vue": "^3.4.37"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.10.0",
+    "@types/node": "^22.5.5",
+    "@vitejs/plugin-vue": "^5.1.2",
+    "@vue/eslint-config-typescript": "^13.0.0",
+    "@vue/tsconfig": "^0.5.1",
+    "autoprefixer": "^10.4.20",
+    "eslint": "^9.10.0",
+    "eslint-plugin-vue": "^9.28.0",
+    "gh-pages": "^6.1.1",
+    "globals": "^15.9.0",
+    "postcss": "^8.4.47",
+    "sass": "1.69",
+    "tsx": "^4.19.1",
+    "typescript": "^5.6.2",
+    "typescript-eslint": "^8.6.0",
+    "typescript-vue-plugin": "^1.8.27",
+    "vite": "^5.4.1",
+    "vue-tsc": "^2.1.6"
+  }
+}
