@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import {reactive, ref, watch} from 'vue';
 import VBtn from './VBtn.vue';
-import defaultAvatar from '@/assets/RoboHash/8C4.png?url';
 import {getAvatar, getIsEvenAD, getText, getUserName, textSourceMap} from '@/utils/fetch-data';
 import type {TextSource} from '@/utils/fetch-data';
 
@@ -31,7 +30,7 @@ const state = reactive<{
   name: 'Chuck Norris',
   text: '',
   from: null,
-  avatar: defaultAvatar,
+  avatar: '',
 });
 
 watch(refreshController, async () => {
