@@ -1,8 +1,10 @@
 <script setup lang="ts">
-import {reactive, ref, watch} from 'vue';
+import {inject, reactive, ref, watch} from 'vue';
 import VBtn from './VBtn.vue';
 import {getAvatar, getIsEvenAD, getText, getUserName, textSourceMap} from '@/utils/fetch-data';
+import {latestDataKey, latestDataSymbol} from '@/utils/constants';
 import type {TextSource} from '@/utils/fetch-data';
+import {Ref} from 'vue';
 
 type Props = {
   isRefreshInCd: boolean
@@ -20,33 +22,49 @@ const isReady = ref(false);
 /** Trigger refreshing by modifying this value */
 const refreshController = ref(0);
 
-const state = reactive<{
+const latestData = inject<Ref<CardData | null>>(latestDataSymbol);
+export type CardData = {
   name: string,
   text: string,
   from: typeof textSourceMap[NonNullable<TextSource>] | null,
   avatar: string,
   ad?: string,
-}>({
+  timestamp: number
+}
+const state = reactive<CardData>({
   name: 'Chuck Norris',
   text: '',
   from: null,
   avatar: '',
+  timestamp: Date.now()
 });
 
 watch(refreshController, async () => {
+  if (
+    !isReady.value &&
+    latestData?.value?.timestamp &&
+    (Date.now() - latestData?.value?.timestamp) < 180000 // 3 minute
+  ) {
+    Object.assign(state, latestData.value);
+    latestData.value = null;
+    isReady.value = true;
+    return;
+  }
   const [avatar, [text, from], name, ad] = await Promise.all([
     getAvatar(),
     getText(),
     getUserName(),
-    Math.random() > 0.4 ? getIsEvenAD() : undefined,
+    Math.random() < 0.25 ? getIsEvenAD() : undefined,
   ]);
-  Object.assign(state, {
+  const newState = {
     name: name ?? 'Chuck Norris',
     text,
     from: from && textSourceMap[from],
     avatar,
     ad
-  });
+  };
+  Object.assign(state, newState);
+  localStorage.setItem(latestDataKey, JSON.stringify(state));
   isReady.value = true;
 }, {immediate: true});
 

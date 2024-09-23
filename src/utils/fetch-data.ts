@@ -5,9 +5,10 @@ import {genString, isNullish, randint, toTitleCase} from './helpers';
 const fetchData = (
   link: string,
   // eslint-disable-next-line
-  callback: ((json: any) => string)
+  callback: ((json: any) => string),
+  init?: RequestInit
 ): Promise<string | null> => {
-  return fetch(link)
+  return fetch(link, init)
     .then(res => {
       if (res.ok) return res.json();
       throw new Error(`${res.status}`);
@@ -29,33 +30,65 @@ export const getChuckNorrisJokes = (): Promise<string | null> => {
 };
 
 /**
- * Fetch useless facts from https://uselessfacts.jsph.pl/
+ * Fetch joke from https://github.com/15Dkatz/official_joke_api
  */
-export const getUselessFacts = (): Promise<string | null> => {
+export const getOfficialJoke = (): Promise<string | null> => {
   return fetchData(
-    'https://uselessfacts.jsph.pl/api/v2/facts/random',
-    json => json.text as string
+    'https://official-joke-api.appspot.com/random_joke',
+    json => json.setup + '\n' + json.punchline
   );
 };
 
-export type TextSource = 'norris' | 'facts' | null;
+/**
+ * Fetch a joke from https://jokeapi.dev
+ */
+export const getJoke = (): Promise<string | null> => {
+  return fetchData(
+    'https://v2.jokeapi.dev/joke/Miscellaneous,Pun,Spooky,Christmas',
+    json => {
+      if (json.type === 'single') {
+        return json.joke as string;
+      }
+      return json.setup + '\n' + json.delivery;
+    }
+  );
+};
+
+/**
+ * Fetch a advice from https://api.adviceslip.com/
+ */
+export const getAdviceSlip = (): Promise<string | null> => {
+  return fetchData(
+    'https://api.adviceslip.com/advice',
+    json => json.slip.advice
+  );
+};
+
+export type TextSource = 'norris' | 'officialJoke' | 'joke' | 'advice' | null;
 export const textSourceMap: {
   [key in NonNullable<TextSource>]: string
 } = {
-  'norris': 'https://api.chucknorris.io/',
-  'facts': 'https://uselessfacts.jsph.pl/',
+  norris: 'https://api.chucknorris.io/',
+  officialJoke: 'https://github.com/15Dkatz/official_joke_api',
+  joke: 'https://jokeapi.dev/#try-it',
+  advice: 'https://api.adviceslip.com/'
 } as const;
 
 export const getText = async () => {
-  const prob = Math.random();
-  let data: [string | null, TextSource] | null = null;
-  if (prob <= 0.5)
-    data = [await getChuckNorrisJokes(), 'norris'];
+  const prob = randint(4);
+  let data: [string | null, TextSource] = [null, null];
+  if (prob === 0)
+    data = [await getOfficialJoke(), 'officialJoke'];
+  else if (prob === 1)
+    data = [await getJoke(), 'joke'];
+  else if (prob === 2)
+    data = [await getAdviceSlip(), 'advice'];
   else
-    data = [await getUselessFacts(), 'facts'];
-  if (isNullish(data![0])) data = ['No data available', null];
+    data = [await getChuckNorrisJokes(), 'norris'];
+  if (isNullish(data[0])) data[0] = 'No data available';
   return data as [string, TextSource];
 };
+
 
 /**
  * Return a avatar from robohash.org
@@ -66,6 +99,7 @@ export const getAvatar = (size: number = 150) => {
   return `https://robohash.org/${key}?set=${set}&size=${size}x${size}`;
 };
 
+
 /** Get 2 random word from random-word-api as a name. */
 export const getUserName = () => {
   return fetchData(
@@ -73,6 +107,7 @@ export const getUserName = () => {
     json => toTitleCase((json as [string, string]).join(' '))
   );
 };
+
 
 /** Get a joke from isEven API as adverts */
 export const getIsEvenAD = () => {

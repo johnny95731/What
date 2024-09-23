@@ -1,12 +1,19 @@
 <script setup lang="ts">
-import {ref} from 'vue';
+import {provide, ref} from 'vue';
 import VCard from './components/VCard.vue';
 import VHeader from './components/VHeader.vue';
 import VBtn from './components/VBtn.vue';
 import {genUniqueKey} from './utils/helpers.ts';
+import {latestDataKey, latestDataSymbol} from './utils/constants.ts';
+import type {CardData} from './components/VCard.vue';
+
+// The latest data we get.
+let latestData_ = localStorage.getItem(latestDataKey);
+const latestData = ref<CardData | null>(latestData_ && JSON.parse(latestData_));
+provide(latestDataSymbol, latestData);
 
 const cardItems = ref<{key: string, ref?: InstanceType<typeof VCard>}[]>([
-  {key: '1'},
+  {key: '0'},
 ]);
 
 const isRefreshInCd = ref(false);
@@ -20,7 +27,7 @@ const refreshTimeout = () => {
   isRefreshInCd.value = true;
   timeoutId.value = setTimeout(() => {
     isRefreshInCd.value = false;
-  }, 300);
+  }, 500);
 };
 
 const handleAddingCard = () => {
